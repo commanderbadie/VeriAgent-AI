@@ -197,6 +197,13 @@
                         "validation":  "12af7a28f5f458bc517de1fe65d4608a82661fbacd27ccf16e6fcfa79f74585f",
                         "test":  "b47f83362a5aae8b49f25940b1985c0004c107a62158787ab1b046076e7ebb5c",
                         "adversarial":  "201cde5c3765567df58f9e3a5f2ffdd4546f9418dbb8cafc6b0c957be911a203",
-                        "sessions":  "7fe074b27935c6d46f167409a776d2518aa521e51697bcd34a284c490fc30bcc"
-                    }
+                        "sessions":  "055cff00addad74b2f9aef4ff7ff8dc68dbe3d305d581d8f6b3dc7d2d7f18ef9"
+                    },
+    "rules_evaluation":  {
+                             "note":  "Rules-evaluation scenarios (deterministic failures) are stored separately and NOT included in Dataset v1.1",
+                             "location":  "data/ml/rules_evaluation_full.jsonl (from v1.0 generation)",
+                             "count":  6,
+                             "included_in_v1_1":  false,
+                             "reason":  "Rules scenarios test deterministic policy violations, not behavioral ML patterns"
+                         }
 }
