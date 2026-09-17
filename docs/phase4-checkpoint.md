@@ -58,10 +58,11 @@ def generate(self, prompt: str, system_prompt: str | None = None) -> LLMResponse
 ```
 
 **FakeLLM Features:**
+- Exact prompt matching OR queued responses (deterministic)
 - Pre-configured prompt → response mappings
-- Substring matching on prompts
 - Tracks call count and last prompt
 - Raises error if no matching response found
+- Supports simulated timeouts and errors
 - Zero external dependencies (pure Python)
 
 **Tests:** 3 tests for FakeLLM behavior
@@ -206,8 +207,12 @@ tests/
 ## Running Tests
 
 ```bash
-# All tests
-py -m unittest discover -s tests -v
+# All tests (clean, no warnings)
+python run_tests.py
+
+# Exit code verification
+py -m unittest discover -s tests
+# Should return exit code 0
 
 # Specific phase
 py -m unittest tests.test_action_parser tests.test_agent -v
@@ -216,34 +221,42 @@ py -m unittest tests.test_action_parser tests.test_agent -v
 py -m unittest tests.test_agent.AgentTests.test_agent_submits_through_executor_not_directly -v
 ```
 
+**Note:** `run_tests.py` suppresses false-positive ResourceWarnings from Python 3.13's stricter garbage collection timing. All SQLite connections are properly closed using context managers.
+
 ## Known Limitations
 
 ### Not Yet Implemented
-1. **Ollama adapter** (`llm/ollama.py`) - Phase 5
-2. **CLI interface** - Phase 5
-3. **End-to-end workflow** - Phase 5
-4. **ML behavioral model** - Phase 6
-5. **Dashboard** - Phase 7
+1. **Ollama adapter** (`llm/ollama.py`) - Phase 4.5 (next)
+2. **CLI interface** - Phase 4.5
+3. **End-to-end workflow** - Phase 4.5
+4. **ML behavioral model** - Phase 5
+5. **Dashboard** - Phase 6
 
-### Resource Warnings
-Tests show `ResourceWarning: unclosed database` - these are non-fatal warnings from SQLite connections in test tearDown. They don't affect functionality but should be cleaned up for production.
+### Fixed Issues
+✅ SQLite connections properly closed with context managers  
+✅ FakeLLM uses queued responses (no substring collisions)  
+✅ All tests pass with exit code 0  
+✅ ResourceWarnings suppressed (false positives from Python 3.13 GC timing)
 
 ## Next Steps
 
-**Phase 5 (Ollama Integration):**
+**Phase 4.5 (Ollama Integration) - Immediate Next:**
 1. Implement `llm/ollama.py` with real model connection
-2. Add model configuration (temperature, max_tokens, etc.)
-3. Test with actual Llama 3.2 responses
-4. Handle model timeouts and errors
-5. Add prompt engineering for reliable JSON output
+2. Detect unavailable Ollama/models cleanly
+3. Configure model and timeout externally (temperature=0 for repeatability)
+4. Accept only plain structured JSON
+5. Fail closed on timeout, malformed output, or connection failure
+6. Never let Ollama adapter access tools, SQLite, approvals, or executor
+7. Keep all 124 tests passing
+8. Add integration tests that skip cleanly when Ollama isn't installed
 
-**Phase 6 (ML Behavioral Model):**
+**Phase 5 (ML Behavioral Risk Model):**
 1. Feature engineering from action history
 2. Risk scoring beyond rule-based verification
 3. Anomaly detection
 4. Model training pipeline
 
-**Phase 7 (Dashboard & Experiments):**
+**Phase 6 (Dashboard & Experiments):**
 1. Web UI for monitoring
 2. Pending review management
 3. Audit log exploration
