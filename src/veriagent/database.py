@@ -74,14 +74,57 @@ CREATE TABLE IF NOT EXISTS action_logs (
 """
 
 SYNTHETIC_SEED = """
+-- Customers 101-120 to match dataset generator range
 INSERT OR IGNORE INTO customers VALUES
     (101, 'Aarav Demo', 'aarav@example.test', '+91-00000-00101', 'ACTIVE'),
-    (102, 'Diya Demo', 'diya@example.test', '+91-00000-00102', 'ACTIVE');
+    (102, 'Diya Demo', 'diya@example.test', '+91-00000-00102', 'ACTIVE'),
+    (103, 'Arjun Kumar', 'arjun.k@example.test', '+91-00000-00103', 'ACTIVE'),
+    (104, 'Priya Singh', 'priya.s@example.test', '+91-00000-00104', 'ACTIVE'),
+    (105, 'Rohan Patel', 'rohan.p@example.test', '+91-00000-00105', 'ACTIVE'),
+    (106, 'Ananya Sharma', 'ananya.s@example.test', '+91-00000-00106', 'ACTIVE'),
+    (107, 'Vihaan Reddy', 'vihaan.r@example.test', '+91-00000-00107', 'ACTIVE'),
+    (108, 'Ishita Gupta', 'ishita.g@example.test', '+91-00000-00108', 'ACTIVE'),
+    (109, 'Aditya Mehta', 'aditya.m@example.test', '+91-00000-00109', 'ACTIVE'),
+    (110, 'Saanvi Joshi', 'saanvi.j@example.test', '+91-00000-00110', 'ACTIVE'),
+    (111, 'Kabir Verma', 'kabir.v@example.test', '+91-00000-00111', 'ACTIVE'),
+    (112, 'Myra Kapoor', 'myra.k@example.test', '+91-00000-00112', 'ACTIVE'),
+    (113, 'Reyansh Nair', 'reyansh.n@example.test', '+91-00000-00113', 'ACTIVE'),
+    (114, 'Aadhya Das', 'aadhya.d@example.test', '+91-00000-00114', 'ACTIVE'),
+    (115, 'Ayaan Shah', 'ayaan.s@example.test', '+91-00000-00115', 'ACTIVE'),
+    (116, 'Kiara Bose', 'kiara.b@example.test', '+91-00000-00116', 'ACTIVE'),
+    (117, 'Vivaan Iyer', 'vivaan.i@example.test', '+91-00000-00117', 'ACTIVE'),
+    (118, 'Aanya Desai', 'aanya.d@example.test', '+91-00000-00118', 'ACTIVE'),
+    (119, 'Shaurya Pillai', 'shaurya.p@example.test', '+91-00000-00119', 'ACTIVE'),
+    (120, 'Navya Menon', 'navya.m@example.test', '+91-00000-00120', 'ACTIVE');
+
+-- Invoices for each customer (INV-1001 to INV-1020)
 INSERT OR IGNORE INTO invoices VALUES
     ('INV-1001', 101, 4500.00, '2026-10-01', 'OPEN'),
-    ('INV-1002', 102, 12000.00, '2026-09-01', 'OVERDUE');
+    ('INV-1002', 102, 12000.00, '2026-09-01', 'OVERDUE'),
+    ('INV-1003', 103, 2800.00, '2026-10-15', 'OPEN'),
+    ('INV-1004', 104, 6700.00, '2026-09-20', 'OPEN'),
+    ('INV-1005', 105, 3400.00, '2026-10-05', 'PAID'),
+    ('INV-1006', 106, 8900.00, '2026-09-15', 'OPEN'),
+    ('INV-1007', 107, 5200.00, '2026-10-10', 'OPEN'),
+    ('INV-1008', 108, 4100.00, '2026-09-25', 'OVERDUE'),
+    ('INV-1009', 109, 7300.00, '2026-10-08', 'OPEN'),
+    ('INV-1010', 110, 3900.00, '2026-09-30', 'PAID'),
+    ('INV-1011', 111, 5600.00, '2026-10-12', 'OPEN'),
+    ('INV-1012', 112, 9200.00, '2026-09-18', 'OPEN'),
+    ('INV-1013', 113, 4800.00, '2026-10-03', 'PAID'),
+    ('INV-1014', 114, 6100.00, '2026-09-22', 'OPEN'),
+    ('INV-1015', 115, 3700.00, '2026-10-14', 'OPEN'),
+    ('INV-1016', 116, 7800.00, '2026-09-28', 'OVERDUE'),
+    ('INV-1017', 117, 5400.00, '2026-10-06', 'OPEN'),
+    ('INV-1018', 118, 4300.00, '2026-09-19', 'PAID'),
+    ('INV-1019', 119, 8500.00, '2026-10-11', 'OPEN'),
+    ('INV-1020', 120, 6900.00, '2026-09-24', 'OPEN');
+
+-- User roles
 INSERT OR IGNORE INTO users VALUES
     (1, 'READ_ONLY'), (2, 'AGENT'), (3, 'ADMIN');
+
+-- Policies
 INSERT OR IGNORE INTO policies VALUES
     (1, 'refund_customer', 10000.00, 1);
 """

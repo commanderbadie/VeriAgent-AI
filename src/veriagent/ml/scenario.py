@@ -10,13 +10,23 @@ from typing import Any
 
 
 class ScenarioLabel(str, Enum):
-    """Binary label for scenario safety.
+    """Binary label for behavioral safety classification.
     
-    SAFE: Action is safe to execute without review
-    UNSAFE: Action requires review or blocking (risky behavior detected)
+    SAFE: No malicious or unreliable behavioral intent detected.
+          The action shows normal, legitimate usage patterns.
+          May still require REVIEW per policy (e.g., high-value transactions, 
+          privileged operations) but the behavioral patterns themselves are trustworthy.
     
-    Note: This is NOT the same as the expected control decision (ALLOW/REVIEW/BLOCK).
-    A SAFE scenario with large amount might still trigger REVIEW per policy.
+    UNSAFE: Behavioral evidence indicates abuse, enumeration, or unacceptable risk.
+            Patterns suggest malicious intent, systematic probing, or unreliable behavior.
+            Examples: slow enumeration, repeated small-value abuse, context mismatches,
+            stealthy data access.
+    
+    CRITICAL: This is NOT the same as the expected control decision (ALLOW/REVIEW/BLOCK).
+    - SAFE + high value → REVIEW (policy-driven)
+    - SAFE + normal value → ALLOW
+    - UNSAFE + moderate risk → REVIEW
+    - UNSAFE + high risk → BLOCK
     """
 
     SAFE = "SAFE"
@@ -26,7 +36,12 @@ class ScenarioLabel(str, Enum):
 class ExpectedDecision(str, Enum):
     """Expected control decision for evaluation purposes only.
     
-    WARNING: This is metadata for evaluation, NEVER a training feature.
+    ALLOW: Policy permits execution without review
+    REVIEW: Policy requires human review before execution
+    BLOCK: Action should be prevented
+    
+    WARNING: This is evaluation metadata, NEVER a training feature.
+    The ML model learns to predict SAFE/UNSAFE labels, not decisions.
     """
 
     ALLOW = "ALLOW"
@@ -81,11 +96,13 @@ class Scenario:
     - No target leakage features
     - Labels have explicit reasoning
     - Separate safety label from expected control decision
+    - References source session and target event for reproducibility
     """
 
     scenario_id: str
     scenario_family: str  # Group related scenarios
     session_id: str
+    target_event_index: int  # Which event in the session this scenario represents
     
     # Proposed action
     action: str
@@ -145,16 +162,18 @@ class Scenario:
     def fingerprint(self) -> str:
         """Create a canonical fingerprint for duplicate detection.
         
-        Fingerprint is based on MODEL INPUTS only (behavioral features + action).
-        Does NOT include: scenario_id, session_id, label, label_reason, expected_decision.
+        Fingerprint is based on core behavioral patterns (not exact timings).
+        Includes: action, role, parameters, and key structural features.
+        Excludes: exact timings (seconds_since_last_action), computed scores, metadata
         
-        This allows detecting truly duplicate inputs even if they have different labels.
+        This allows detecting truly duplicate structural inputs while permitting
+        natural timing variation.
         """
         sig = {
             "action": self.action,
             "user_role": self.user_role,
             "parameters": self.parameters,
-            # Include key behavioral features that define the input
+            # Include structural behavioral features (deterministic from session)
             "behavioral_features": {
                 "tool_sensitivity": self.behavioral_features.tool_sensitivity,
                 "has_amount": self.behavioral_features.has_amount,
@@ -165,6 +184,10 @@ class Scenario:
                 "retry_count": self.behavioral_features.retry_count,
                 "previous_failure_count": self.behavioral_features.previous_failure_count,
                 "is_rapid_sequence": self.behavioral_features.is_rapid_sequence,
+                # Exclude: seconds_since_last_action (too specific, causes false duplicates)
+                # Exclude: action_frequency (same as same_action_count)
+                # Exclude: sequence_anomaly_score (has random noise)
+                # Exclude: context_action_match (has random noise)
             }
         }
         canonical = json.dumps(sig, sort_keys=True, ensure_ascii=False)
