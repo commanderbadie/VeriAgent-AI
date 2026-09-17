@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
-"""Test runner that suppresses false-positive ResourceWarnings from SQLite."""
+"""Test runner for VeriAgent test suite."""
 
 import sys
 import unittest
-import warnings
-
-# Suppress ResourceWarnings from SQLite connections
-# These are false positives - connections are properly closed in context managers
-warnings.filterwarnings("ignore", category=ResourceWarning, message="unclosed database")
 
 if __name__ == "__main__":
     loader = unittest.TestLoader()

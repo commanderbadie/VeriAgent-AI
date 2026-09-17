@@ -5,6 +5,7 @@ from .agent import AgentResponse, VeriAgent
 from .executor import ExecutionResult, ExecutionStatus, SecureExecutor
 from .llm.base import BaseLLM, LLMError, LLMResponse, LLMTimeout
 from .llm.fake import FakeLLM
+from .llm.ollama import OllamaLLM, ollama_available
 from .models import Decision, ProposedAction, VerificationResult
 from .repository import Customer, Invoice, NotFoundError, Repository, ValidationError
 from .tool_registry import ToolDefinition, ToolNotFoundError, ToolRegistry
@@ -38,6 +39,8 @@ __all__ = [
     "LLMError",
     "LLMTimeout",
     "FakeLLM",
+    "OllamaLLM",
+    "ollama_available",
     "VeriAgent",
     "AgentResponse",
 ]
