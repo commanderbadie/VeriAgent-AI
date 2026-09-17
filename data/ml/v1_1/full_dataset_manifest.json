@@ -1,0 +1,202 @@
+{
+    "dataset_version":  "v1.1.0",
+    "generator_version":  "pilot_v2.2",
+    "generated_at":  "2026-09-18T03:58:01.778830Z",
+    "seed":  42,
+    "changes_from_v1_0":  "Fixed session_id leakage by implementing session-aware splitting",
+    "splits":  {
+                   "train":  {
+                                 "count":  125,
+                                 "unique_sessions":  125,
+                                 "by_label":  {
+                                                  "SAFE":  75,
+                                                  "UNSAFE":  50
+                                              },
+                                 "by_role":  {
+                                                 "ADMIN":  83,
+                                                 "READ_ONLY":  6,
+                                                 "AGENT":  36
+                                             },
+                                 "by_action":  {
+                                                   "update_customer":  15,
+                                                   "get_customer":  53,
+                                                   "refund_customer":  41,
+                                                   "create_invoice":  5,
+                                                   "calculate_balance":  11
+                                               },
+                                 "by_family":  {
+                                                   "unusual_admin_workflow":  12,
+                                                   "normal_read":  30,
+                                                   "normal_refund":  14,
+                                                   "repeated_low_value_abuse":  9,
+                                                   "context_action_mismatch":  10,
+                                                   "slow_enumeration":  5,
+                                                   "stealthy_data_access":  7,
+                                                   "suspicious_moderate_anomaly":  10,
+                                                   "suspicious_invoicing":  5,
+                                                   "legitimate_high_value":  8,
+                                                   "routine_calculation":  8,
+                                                   "rapid_failures":  4,
+                                                   "legitimate_rapid_support":  3
+                                               }
+                             },
+                   "validation":  {
+                                      "count":  41,
+                                      "unique_sessions":  41,
+                                      "by_label":  {
+                                                       "UNSAFE":  16,
+                                                       "SAFE":  25
+                                                   },
+                                      "by_role":  {
+                                                      "ADMIN":  25,
+                                                      "AGENT":  15,
+                                                      "READ_ONLY":  1
+                                                  },
+                                      "by_action":  {
+                                                        "refund_customer":  17,
+                                                        "get_customer":  15,
+                                                        "create_invoice":  1,
+                                                        "calculate_balance":  7,
+                                                        "update_customer":  1
+                                                    },
+                                      "by_family":  {
+                                                        "repeated_low_value_abuse":  5,
+                                                        "stealthy_data_access":  3,
+                                                        "normal_read":  7,
+                                                        "normal_refund":  4,
+                                                        "legitimate_high_value":  6,
+                                                        "suspicious_invoicing":  1,
+                                                        "slow_enumeration":  3,
+                                                        "context_action_mismatch":  2,
+                                                        "routine_calculation":  7,
+                                                        "rapid_failures":  2,
+                                                        "unusual_admin_workflow":  1
+                                                    }
+                                  },
+                   "test_frozen":  {
+                                       "count":  44,
+                                       "unique_sessions":  44,
+                                       "by_label":  {
+                                                        "UNSAFE":  18,
+                                                        "SAFE":  26
+                                                    },
+                                       "by_role":  {
+                                                       "AGENT":  14,
+                                                       "ADMIN":  25,
+                                                       "READ_ONLY":  5
+                                                   },
+                                       "by_action":  {
+                                                         "get_customer":  17,
+                                                         "calculate_balance":  9,
+                                                         "update_customer":  5,
+                                                         "refund_customer":  12,
+                                                         "create_invoice":  1
+                                                     },
+                                       "by_family":  {
+                                                         "stealthy_data_access":  4,
+                                                         "normal_read":  5,
+                                                         "routine_calculation":  6,
+                                                         "unusual_admin_workflow":  3,
+                                                         "legitimate_high_value":  7,
+                                                         "slow_enumeration":  6,
+                                                         "context_action_mismatch":  2,
+                                                         "legitimate_rapid_support":  2,
+                                                         "normal_refund":  3,
+                                                         "suspicious_moderate_anomaly":  4,
+                                                         "suspicious_invoicing":  1,
+                                                         "rapid_failures":  1
+                                                     }
+                                   },
+                   "adversarial_frozen":  {
+                                              "count":  25,
+                                              "unique_sessions":  25,
+                                              "by_label":  {
+                                                               "UNSAFE":  25
+                                                           },
+                                              "by_role":  {
+                                                              "AGENT":  7,
+                                                              "READ_ONLY":  4,
+                                                              "ADMIN":  14
+                                                          },
+                                              "by_action":  {
+                                                                "get_customer":  13,
+                                                                "refund_customer":  7,
+                                                                "calculate_balance":  4,
+                                                                "create_invoice":  1
+                                                            },
+                                              "by_family":  {
+                                                                "rapid_failures":  3,
+                                                                "slow_enumeration":  6,
+                                                                "repeated_low_value_abuse":  6,
+                                                                "suspicious_moderate_anomaly":  6,
+                                                                "suspicious_invoicing":  1,
+                                                                "stealthy_data_access":  2,
+                                                                "context_action_mismatch":  1
+                                                            }
+                                          }
+               },
+    "totals":  {
+                   "primary_scenarios":  210,
+                   "adversarial_scenarios":  25,
+                   "total_scenarios":  235,
+                   "total_safe":  126,
+                   "total_unsafe":  109,
+                   "unique_sessions":  235,
+                   "stored_session_count":  235,
+                   "referenced_session_count":  235,
+                   "orphan_session_count":  0,
+                   "missing_session_count":  0,
+                   "rules_session_count":  0
+               },
+    "features":  {
+                     "count":  14,
+                     "names":  [
+                                   "tool_sensitivity",
+                                   "has_amount",
+                                   "amount_log",
+                                   "num_parameters",
+                                   "tool_call_count",
+                                   "same_action_count",
+                                   "retry_count",
+                                   "previous_failure_count",
+                                   "seconds_since_last_action",
+                                   "is_rapid_sequence",
+                                   "action_frequency",
+                                   "sequence_anomaly_score",
+                                   "context_action_match",
+                                   "user_role"
+                               ]
+                 },
+    "leakage_audit":  {
+                          "session_overlap":  {
+                                                  "train_val":  0,
+                                                  "train_test":  0,
+                                                  "train_adv":  0,
+                                                  "val_test":  0,
+                                                  "val_adv":  0,
+                                                  "test_adv":  0,
+                                                  "status":  "PASS"
+                                              },
+                          "fingerprint_overlap":  {
+                                                      "train_val":  0,
+                                                      "train_test":  0,
+                                                      "train_adv":  0,
+                                                      "val_test":  0,
+                                                      "val_adv":  0,
+                                                      "test_adv":  0,
+                                                      "status":  "PASS"
+                                                  },
+                          "session_references":  {
+                                                     "missing_sessions":  0,
+                                                     "invalid_target_indexes":  0,
+                                                     "status":  "PASS"
+                                                 }
+                      },
+    "file_hashes":  {
+                        "train":  "b2315937ddaaf24b5d4300c82b38c1fa9005e2e07c1e0ec3a8dc78cc6fdb532c",
+                        "validation":  "12af7a28f5f458bc517de1fe65d4608a82661fbacd27ccf16e6fcfa79f74585f",
+                        "test":  "b47f83362a5aae8b49f25940b1985c0004c107a62158787ab1b046076e7ebb5c",
+                        "adversarial":  "201cde5c3765567df58f9e3a5f2ffdd4546f9418dbb8cafc6b0c957be911a203",
+                        "sessions":  "7fe074b27935c6d46f167409a776d2518aa521e51697bcd34a284c490fc30bcc"
+                    }
+}
