@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "veriagent"
+version = "0.1.0"
+description = "Independent verification and risk-management layer for AI-agent actions"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "VeriAgent Team" }]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+ml = ["numpy>=1.26", "pandas>=2.2", "scikit-learn>=1.5", "matplotlib>=3.9"]
+app = ["fastapi>=0.115", "uvicorn>=0.30", "streamlit>=1.38"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
