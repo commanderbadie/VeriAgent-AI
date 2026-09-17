@@ -3,10 +3,26 @@
 import sqlite3
 import tempfile
 import unittest
+from contextlib import contextmanager
 from pathlib import Path
+from typing import Generator
 
 from veriagent import Customer, Invoice, NotFoundError, Repository, ValidationError
 from veriagent.database import initialize_database
+
+
+@contextmanager
+def _db_connection(db_path: str | Path) -> Generator[sqlite3.Connection, None, None]:
+    """Context manager that properly closes SQLite connections."""
+    conn = sqlite3.connect(db_path)
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 
 class RepositoryTests(unittest.TestCase):
@@ -133,7 +149,7 @@ class RepositoryTests(unittest.TestCase):
 
     def test_get_customer_invoices_empty(self) -> None:
         # Add a customer with no invoices
-        with sqlite3.connect(self.db_path) as conn:
+        with _db_connection(self.db_path) as conn:
             conn.execute(
                 "INSERT INTO customers VALUES (999, 'Test', 'test@example.test', NULL, 'ACTIVE')"
             )
@@ -184,7 +200,7 @@ class RepositoryTests(unittest.TestCase):
     def test_transaction_rollback_on_error(self) -> None:
         """Test that failed operations don't leave partial data."""
         initial_count = 0
-        with sqlite3.connect(self.db_path) as conn:
+        with _db_connection(self.db_path) as conn:
             cursor = conn.execute("SELECT COUNT(*) FROM customers")
             initial_count = cursor.fetchone()[0]
 
@@ -193,7 +209,7 @@ class RepositoryTests(unittest.TestCase):
             self.repo.update_customer(101, invalid="test")
 
         # Verify customer count unchanged
-        with sqlite3.connect(self.db_path) as conn:
+        with _db_connection(self.db_path) as conn:
             cursor = conn.execute("SELECT COUNT(*) FROM customers")
             final_count = cursor.fetchone()[0]
         self.assertEqual(initial_count, final_count)

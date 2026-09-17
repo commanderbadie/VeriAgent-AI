@@ -3,7 +3,24 @@
 from __future__ import annotations
 
 import sqlite3
+from contextlib import contextmanager
 from pathlib import Path
+from typing import Generator
+
+
+@contextmanager
+def _db_connection(db_path: str | Path) -> Generator[sqlite3.Connection, None, None]:
+    """Context manager that properly closes SQLite connections."""
+    conn = sqlite3.connect(db_path)
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
 
 SCHEMA = """
 PRAGMA foreign_keys = ON;
@@ -75,7 +92,7 @@ def initialize_database(path: str | Path = "data/veriagent.db") -> Path:
 
     database_path = Path(path)
     database_path.parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(database_path) as connection:
+    with _db_connection(database_path) as connection:
         connection.executescript(SCHEMA)
         connection.executescript(SYNTHETIC_SEED)
     return database_path

@@ -21,13 +21,28 @@ from __future__ import annotations
 
 import json
 import sqlite3
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, Generator
 
 from .models import Decision, ProposedAction, VerificationResult
+
+
+@contextmanager
+def _db_connection(db_path: str | Path) -> Generator[sqlite3.Connection, None, None]:
+    """Context manager that properly closes SQLite connections."""
+    conn = sqlite3.connect(db_path)
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 from .repository import Repository
 from .tool_registry import ToolNotFoundError, ToolRegistry
 from .verifier import RuleVerifier
@@ -75,7 +90,7 @@ class SecureExecutor:
 
     def _ensure_tables(self) -> None:
         """Create pending_reviews table if it doesn't exist."""
-        with sqlite3.connect(self.database_path) as conn:
+        with _db_connection(self.database_path) as conn:
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS pending_reviews (
@@ -167,7 +182,7 @@ class SecureExecutor:
         self, proposal: ProposedAction, verification: VerificationResult, action_log_id: int
     ) -> ExecutionResult:
         """Queue a REVIEW decision for human approval."""
-        with sqlite3.connect(self.database_path) as conn:
+        with _db_connection(self.database_path) as conn:
             cursor = conn.execute(
                 """
                 INSERT INTO pending_reviews (
@@ -230,7 +245,7 @@ class SecureExecutor:
         - If revalidation returns BLOCK → reject (approval cannot override BLOCK)
         """
         # Step 1: Fetch the pending review
-        with sqlite3.connect(self.database_path) as conn:
+        with _db_connection(self.database_path) as conn:
             conn.row_factory = sqlite3.Row
             cursor = conn.execute(
                 "SELECT * FROM pending_reviews WHERE review_id = ? AND status = 'PENDING'",
@@ -263,7 +278,7 @@ class SecureExecutor:
         if verification.decision == Decision.BLOCK:
             # Human approval cannot override a hard BLOCK
             # BLOCK means: missing entity, no permission, invalid parameters, etc.
-            with sqlite3.connect(self.database_path) as conn:
+            with _db_connection(self.database_path) as conn:
                 conn.execute(
                     """
                     UPDATE pending_reviews
@@ -309,7 +324,7 @@ class SecureExecutor:
             )
 
             # Update review status with approval details
-            with sqlite3.connect(self.database_path) as conn:
+            with _db_connection(self.database_path) as conn:
                 conn.execute(
                     """
                     UPDATE pending_reviews
@@ -335,7 +350,7 @@ class SecureExecutor:
 
         except Exception as e:
             # Tool execution failed
-            with sqlite3.connect(self.database_path) as conn:
+            with _db_connection(self.database_path) as conn:
                 conn.execute(
                     """
                     UPDATE pending_reviews
@@ -360,7 +375,7 @@ class SecureExecutor:
 
     def reject_review(self, review_id: int, reviewed_by: str) -> ExecutionResult:
         """Reject a pending review without executing."""
-        with sqlite3.connect(self.database_path) as conn:
+        with _db_connection(self.database_path) as conn:
             conn.row_factory = sqlite3.Row
             cursor = conn.execute(
                 "SELECT * FROM pending_reviews WHERE review_id = ? AND status = 'PENDING'",
@@ -403,7 +418,7 @@ class SecureExecutor:
 
     def get_pending_reviews(self) -> list[dict[str, Any]]:
         """Retrieve all pending reviews awaiting human decision."""
-        with sqlite3.connect(self.database_path) as conn:
+        with _db_connection(self.database_path) as conn:
             conn.row_factory = sqlite3.Row
             cursor = conn.execute(
                 """

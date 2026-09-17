@@ -4,9 +4,12 @@ CRITICAL SECURITY TESTS:
 These tests prove that BLOCK and REVIEW decisions never result in tool execution.
 """
 
+import sqlite3
 import tempfile
 import unittest
+from contextlib import contextmanager
 from pathlib import Path
+from typing import Generator
 from unittest.mock import MagicMock, call
 
 from veriagent import (
@@ -18,6 +21,20 @@ from veriagent import (
     SecureExecutor,
     ToolRegistry,
 )
+
+
+@contextmanager
+def _db_connection(db_path: str | Path) -> Generator[sqlite3.Connection, None, None]:
+    """Context manager that properly closes SQLite connections."""
+    conn = sqlite3.connect(db_path)
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 from veriagent.database import initialize_database
 
 
@@ -222,8 +239,7 @@ class SecureExecutorTests(unittest.TestCase):
         review_id = submit_result.execution_id
 
         # Now delete the customer to make revalidation fail with BLOCK
-        import sqlite3
-        with sqlite3.connect(self.db_path) as conn:
+        with _db_connection(self.db_path) as conn:
             conn.execute("DELETE FROM customers WHERE customer_id = 101")
 
         # Try to approve - revalidation will BLOCK (customer doesn't exist)
@@ -370,7 +386,7 @@ class SecureExecutorTests(unittest.TestCase):
             self.executor.submit(proposal)
 
         # Check audit log
-        with sqlite3.connect(self.db_path) as conn:
+        with _db_connection(self.db_path) as conn:
             cursor = conn.execute("SELECT COUNT(*) FROM action_logs")
             count = cursor.fetchone()[0]
             self.assertEqual(count, 3)
