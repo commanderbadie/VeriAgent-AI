@@ -1,0 +1,34 @@
+{
+  "dataset_type": "pilot_v2.1",
+  "behavioral_scenarios": 30,
+  "rules_evaluation_scenarios": 6,
+  "seed": 42,
+  "label_distribution": {
+    "SAFE": 18,
+    "UNSAFE": 12
+  },
+  "scenario_families": [
+    "legitimate_rapid_support",
+    "context_action_mismatch",
+    "repeated_low_value_abuse",
+    "stealthy_data_access",
+    "slow_enumeration",
+    "legitimate_high_value",
+    "normal_refund",
+    "unusual_admin_workflow",
+    "normal_read",
+    "routine_calculation",
+    "suspicious_moderate_anomaly"
+  ],
+  "feature_count": 14,
+  "generated_by": "DatasetGenerator v2.1",
+  "improvements_over_v2": [
+    "Explicit quotas (18 SAFE, 12 UNSAFE)",
+    "Real counterexamples (legitimate rapid vs slow enumeration)",
+    "Anomaly scores computed from raw events",
+    "Deterministic failures moved to separate file",
+    "Duplicate detection based on model inputs only",
+    "Genuine multi-event sessions",
+    "Expanded customer ID range (101-120)"
+  ]
+}

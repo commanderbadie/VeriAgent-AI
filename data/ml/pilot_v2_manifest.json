@@ -1,0 +1,27 @@
+{
+  "dataset_type": "pilot_v2",
+  "total_scenarios": 30,
+  "seed": 42,
+  "label_distribution": {
+    "SAFE": 28,
+    "UNSAFE": 2
+  },
+  "scenario_families": [
+    "bulk_legitimate",
+    "normal_update",
+    "normal_refund",
+    "unauthorized",
+    "normal_read",
+    "routine_operation"
+  ],
+  "feature_count": 14,
+  "generated_by": "DatasetGenerator v2.0",
+  "improvements": [
+    "Exact scenario count",
+    "Session-based feature extraction",
+    "Overlapping feature distributions",
+    "Correct role vocabulary (ADMIN/AGENT/READ_ONLY)",
+    "Separate safety label from expected decision",
+    "Canonical fingerprints for duplicate detection"
+  ]
+}

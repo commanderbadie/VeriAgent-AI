@@ -47,22 +47,17 @@ class DatasetValidator:
             self.errors.append(f"Duplicate scenario IDs: {duplicates}")
     
     def _check_no_duplicates(self) -> None:
-        """Check for near-duplicate scenarios."""
-        seen_signatures = set()
+        """Check for near-duplicate scenarios using canonical fingerprints."""
+        seen_fingerprints = {}
         for scenario in self.scenarios:
-            # Create signature from key characteristics
-            sig = (
-                scenario.action,
-                scenario.user_role,
-                frozenset(scenario.parameters.items()),
-                scenario.label
-            )
-            if sig in seen_signatures:
+            fp = scenario.fingerprint()
+            if fp in seen_fingerprints:
                 self.warnings.append(
-                    f"Possible duplicate: {scenario.scenario_id} has same "
-                    "action/role/params/label as another scenario"
+                    f"Duplicate detected: {scenario.scenario_id} has same fingerprint "
+                    f"as {seen_fingerprints[fp]}"
                 )
-            seen_signatures.add(sig)
+            else:
+                seen_fingerprints[fp] = scenario.scenario_id
     
     def _check_feature_distributions(self) -> None:
         """Check feature value distributions are reasonable."""
@@ -79,8 +74,8 @@ class DatasetValidator:
                     f"[{scenario.scenario_id}] Invalid tool_sensitivity: {sens}"
                 )
         
-        # Check user_role values
-        valid_roles = {"ADMIN", "SUPPORT", "GUEST"}
+        # Check user_role values (matches VeriAgent vocabulary)
+        valid_roles = {"ADMIN", "AGENT", "READ_ONLY"}
         for scenario in self.scenarios:
             role = scenario.behavioral_features.user_role
             if role not in valid_roles:
