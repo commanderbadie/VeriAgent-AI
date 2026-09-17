@@ -1,0 +1,19 @@
+{
+  "dataset_type": "pilot",
+  "total_scenarios": 14,
+  "seed": 42,
+  "label_distribution": {
+    "SAFE": 8,
+    "UNSAFE": 6
+  },
+  "scenario_families": [
+    "large_refund",
+    "rapid_sequence",
+    "normal_refund",
+    "simple_read",
+    "nonexistent_entity",
+    "missing_params"
+  ],
+  "feature_count": 14,
+  "generated_by": "DatasetGenerator v1.0"
+}
