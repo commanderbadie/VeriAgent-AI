@@ -37,10 +37,10 @@ VeriAgent does **not** claim to make AI agents completely safe. The project will
 
 ```text
 src/veriagent/       Core Python package
- tests/               Automated tests
- docs/                Scope and architecture
- data/                Synthetic data artifacts
- experiments/         Reproducible experiment outputs
+tests/               Automated tests
+docs/                Scope and architecture
+data/                Synthetic data artifacts
+experiments/         Reproducible experiment outputs
 ```
 
 ## Quick start
@@ -50,7 +50,7 @@ python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
 pip install -e .
 python -m veriagent.demo
-python -m unittest discover -s tests -v
+python run_tests.py
 ```
 
 ## Research question
@@ -59,7 +59,7 @@ python -m unittest discover -s tests -v
 
 ## Current status
 
-Initial project scaffold: deterministic verification baseline, synthetic SQLite schema, demo, and tests.
+✅ **Phase 4 Complete:** AI agent orchestration with strict fail-closed security (124 tests passing)
 
 ## Academic integrity
 
