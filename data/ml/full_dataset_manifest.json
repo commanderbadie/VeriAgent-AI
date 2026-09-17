@@ -1,0 +1,200 @@
+{
+  "dataset_version": "v1.0.0",
+  "generator_version": "pilot_v2.2",
+  "generated_at": "2026-09-17T22:07:43.770830Z",
+  "seed": 42,
+  "splits": {
+    "train": {
+      "count": 109,
+      "by_label": {
+        "SAFE": 69,
+        "UNSAFE": 40
+      },
+      "by_role": {
+        "ADMIN": 78,
+        "AGENT": 29,
+        "READ_ONLY": 2
+      },
+      "by_action": {
+        "refund_customer": 42,
+        "update_customer": 13,
+        "get_customer": 37,
+        "calculate_balance": 13,
+        "create_invoice": 4
+      },
+      "by_family": {
+        "normal_refund": 13,
+        "unusual_admin_workflow": 10,
+        "normal_read": 20,
+        "repeated_low_value_abuse": 8,
+        "stealthy_data_access": 8,
+        "legitimate_high_value": 13,
+        "routine_calculation": 10,
+        "context_action_mismatch": 8,
+        "rapid_failures": 3,
+        "suspicious_invoicing": 4,
+        "suspicious_moderate_anomaly": 8,
+        "slow_enumeration": 1,
+        "legitimate_rapid_support": 3
+      }
+    },
+    "validation": {
+      "count": 36,
+      "by_label": {
+        "UNSAFE": 15,
+        "SAFE": 21
+      },
+      "by_role": {
+        "ADMIN": 24,
+        "AGENT": 11,
+        "READ_ONLY": 1
+      },
+      "by_action": {
+        "create_invoice": 1,
+        "get_customer": 13,
+        "refund_customer": 13,
+        "update_customer": 4,
+        "calculate_balance": 5
+      },
+      "by_family": {
+        "suspicious_invoicing": 1,
+        "suspicious_moderate_anomaly": 3,
+        "legitimate_high_value": 4,
+        "stealthy_data_access": 3,
+        "unusual_admin_workflow": 3,
+        "routine_calculation": 3,
+        "normal_read": 7,
+        "repeated_low_value_abuse": 3,
+        "slow_enumeration": 1,
+        "context_action_mismatch": 3,
+        "legitimate_rapid_support": 1,
+        "normal_refund": 3,
+        "rapid_failures": 1
+      }
+    },
+    "test_frozen": {
+      "count": 36,
+      "by_label": {
+        "SAFE": 21,
+        "UNSAFE": 15
+      },
+      "by_role": {
+        "ADMIN": 26,
+        "AGENT": 9,
+        "READ_ONLY": 1
+      },
+      "by_action": {
+        "refund_customer": 13,
+        "get_customer": 12,
+        "update_customer": 4,
+        "create_invoice": 2,
+        "calculate_balance": 5
+      },
+      "by_family": {
+        "normal_refund": 3,
+        "normal_read": 6,
+        "context_action_mismatch": 3,
+        "repeated_low_value_abuse": 3,
+        "legitimate_high_value": 4,
+        "unusual_admin_workflow": 3,
+        "suspicious_invoicing": 2,
+        "suspicious_moderate_anomaly": 3,
+        "routine_calculation": 4,
+        "stealthy_data_access": 3,
+        "rapid_failures": 1,
+        "legitimate_rapid_support": 1
+      }
+    },
+    "adversarial_frozen": {
+      "count": 25,
+      "by_label": {
+        "UNSAFE": 25
+      },
+      "by_role": {
+        "AGENT": 5,
+        "READ_ONLY": 2,
+        "ADMIN": 18
+      },
+      "by_action": {
+        "get_customer": 11,
+        "refund_customer": 10,
+        "calculate_balance": 3,
+        "create_invoice": 1
+      },
+      "by_family": {
+        "rapid_failures": 3,
+        "slow_enumeration": 2,
+        "repeated_low_value_abuse": 10,
+        "suspicious_moderate_anomaly": 7,
+        "suspicious_invoicing": 1,
+        "stealthy_data_access": 2
+      }
+    }
+  },
+  "totals": {
+    "primary_scenarios": 181,
+    "adversarial_scenarios": 25,
+    "total_scenarios": 206,
+    "total_safe": 111,
+    "total_unsafe": 95
+  },
+  "features": {
+    "count": 14,
+    "names": [
+      "tool_sensitivity",
+      "has_amount",
+      "amount_log",
+      "num_parameters",
+      "tool_call_count",
+      "same_action_count",
+      "retry_count",
+      "previous_failure_count",
+      "seconds_since_last_action",
+      "is_rapid_sequence",
+      "action_frequency",
+      "sequence_anomaly_score",
+      "context_action_match",
+      "user_role"
+    ]
+  },
+  "integrity_checks": {
+    "duplicate_fingerprints": {
+      "status": "FAIL",
+      "count": 5,
+      "details": [
+        "rapid_failures_024 <-> rapid_failures_006",
+        "rapid_failures_024 <-> rapid_failures_006",
+        "slow_enumeration_019 <-> slow_enumeration_008",
+        "slow_enumeration_026 <-> slow_enumeration_001",
+        "rapid_failures_024 <-> rapid_failures_006"
+      ]
+    },
+    "family_leakage": {
+      "status": "FAIL",
+      "violations": [
+        "Train-Val overlap: {'routine_calculation', 'repeated_low_value_abuse', 'rapid_failures', 'legitimate_high_value', 'context_action_mismatch', 'stealthy_data_access', 'normal_read', 'normal_refund', 'slow_enumeration', 'legitimate_rapid_support', 'unusual_admin_workflow', 'suspicious_invoicing', 'suspicious_moderate_anomaly'}",
+        "Train-Test overlap: {'routine_calculation', 'repeated_low_value_abuse', 'rapid_failures', 'context_action_mismatch', 'stealthy_data_access', 'normal_read', 'normal_refund', 'legitimate_high_value', 'legitimate_rapid_support', 'unusual_admin_workflow', 'suspicious_invoicing', 'suspicious_moderate_anomaly'}",
+        "Train-Adv overlap: {'repeated_low_value_abuse', 'rapid_failures', 'stealthy_data_access', 'slow_enumeration', 'suspicious_invoicing', 'suspicious_moderate_anomaly'}",
+        "Val-Test overlap: {'routine_calculation', 'repeated_low_value_abuse', 'rapid_failures', 'context_action_mismatch', 'stealthy_data_access', 'normal_read', 'normal_refund', 'legitimate_high_value', 'legitimate_rapid_support', 'unusual_admin_workflow', 'suspicious_invoicing', 'suspicious_moderate_anomaly'}",
+        "Val-Adv overlap: {'repeated_low_value_abuse', 'rapid_failures', 'stealthy_data_access', 'slow_enumeration', 'suspicious_invoicing', 'suspicious_moderate_anomaly'}",
+        "Test-Adv overlap: {'repeated_low_value_abuse', 'rapid_failures', 'stealthy_data_access', 'suspicious_invoicing', 'suspicious_moderate_anomaly'}"
+      ]
+    },
+    "schema_validation": {
+      "status": "PASS",
+      "note": "All scenarios validated during generation"
+    }
+  },
+  "file_hashes": {
+    "train": "4756d97b317ae5f5a14cb1f52616bc2a05de610669a7f8d34b6c0b393bae8a2d",
+    "validation": "d215d08fd1c6639a3038a18e5e07f8945d38fc4bbd174c1d3f59d7f7c849add6",
+    "test": "7e6be78700cb956ee0ab9766d06da6bbfadcf57043c77ad53a4644ae21e6ec16",
+    "adversarial": "727b5673b9768023933eff6679719ce66c6d772891b737d1f834fbc0f841469e",
+    "sessions": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rules": "0f506d77233b06476319be60964d480ef9ddbe54a2bfbafec150a7e5b90c2c27"
+  },
+  "rules_evaluation": {
+    "note": "Deterministic rule failures stored separately",
+    "file": "data/ml/rules_evaluation_full.jsonl"
+  }
+}
