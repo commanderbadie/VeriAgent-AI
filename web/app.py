@@ -188,13 +188,33 @@ def verify_action():
         # Get behavioral context if provided
         behavioral_context = data.get('behavioral_context')
         
+        # Check if we have any verifier
+        if not rule_verifier and not hybrid_verifier:
+            return jsonify({
+                'decision': 'ERROR',
+                'reasons': ['Verifier not initialized - database or models missing'],
+                'checks': {},
+                'verifier_used': 'none',
+                'ml_available': False,
+                'timestamp': datetime.now().isoformat()
+            }), 500
+        
         # Verify using appropriate verifier
         if hybrid_verifier and behavioral_context:
             result = hybrid_verifier.verify(proposal, behavioral_context)
             verifier_used = "hybrid"
-        else:
+        elif rule_verifier:
             result = rule_verifier.verify(proposal)
             verifier_used = "rules_only"
+        else:
+            return jsonify({
+                'decision': 'ERROR',
+                'reasons': ['No verifier available'],
+                'checks': {},
+                'verifier_used': 'none',
+                'ml_available': False,
+                'timestamp': datetime.now().isoformat()
+            }), 500
         
         # Format response
         response = {
@@ -211,7 +231,9 @@ def verify_action():
     except Exception as e:
         return jsonify({
             'error': str(e),
-            'decision': 'ERROR'
+            'decision': 'ERROR',
+            'reasons': [f'Verification error: {str(e)}'],
+            'checks': {},
         }), 400
 
 
@@ -224,6 +246,14 @@ def get_examples():
 @app.route('/api/stats')
 def get_stats():
     """Get system statistics."""
+    # Get role permissions safely
+    if rule_verifier:
+        available_actions = list(rule_verifier.role_permissions.get('ADMIN', []))
+        available_roles = list(rule_verifier.role_permissions.keys())
+    else:
+        available_actions = ['get_customer', 'calculate_balance', 'refund_customer']
+        available_roles = ['READ_ONLY', 'AGENT', 'ADMIN']
+    
     stats = {
         'ml_available': ML_AVAILABLE,
         'model_performance': {
@@ -231,8 +261,8 @@ def get_stats():
             'adversarial_accuracy': 1.0 if ML_AVAILABLE else None,
             'model_type': 'Random Forest' if ML_AVAILABLE else None
         },
-        'available_actions': list(rule_verifier.role_permissions.get('ADMIN', [])),
-        'available_roles': list(rule_verifier.role_permissions.keys()),
+        'available_actions': available_actions,
+        'available_roles': available_roles,
         'total_scenarios_trained': 166 if ML_AVAILABLE else 0,
         'test_scenarios': 69 if ML_AVAILABLE else 0
     }
