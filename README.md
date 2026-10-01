@@ -1,6 +1,6 @@
 # VeriAgent
 
-**.**
+**A framework for reliable and safe AI-agent actions.**
 
 VeriAgent is a final-year B.E. Computer Science research project investigating whether an independent verification layer can reduce unsafe, incorrect, and unauthorized AI-agent actions while maintaining acceptable task performance.
 
