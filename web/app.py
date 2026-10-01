@@ -29,24 +29,52 @@ try:
     model_dir = project_root / 'experiments' / 'outputs' / 'phase5_models'
     database_path = project_root / 'data' / 'veriagent.db'
     
-    rule_verifier = RuleVerifier(database_path=str(database_path))
-    ml_verifier = MLVerifier(model_dir=model_dir)
-    hybrid_verifier = HybridVerifier(
-        rule_verifier=rule_verifier,
-        ml_verifier=ml_verifier,
-        require_ml=False  # Graceful degradation
-    )
-    ML_AVAILABLE = True
-except Exception as e:
-    print(f"Warning: ML model not available: {e}")
-    # Try to create rule verifier without database dependency
-    try:
-        project_root = Path(__file__).parent.parent
-        database_path = project_root / 'data' / 'veriagent.db'
+    # Try with database first
+    if database_path.exists():
         rule_verifier = RuleVerifier(database_path=str(database_path))
+    else:
+        # Create verifier without database (skip entity checks)
+        from veriagent.verifier import DEFAULT_ROLE_PERMISSIONS
+        rule_verifier = type('obj', (object,), {
+            'role_permissions': DEFAULT_ROLE_PERMISSIONS,
+            'verify': lambda self, proposal: type('obj', (object,), {
+                'decision': Decision.ALLOW if proposal.action in DEFAULT_ROLE_PERMISSIONS.get(proposal.user_role, frozenset()) else Decision.BLOCK,
+                'reasons': ('Permission check passed',) if proposal.action in DEFAULT_ROLE_PERMISSIONS.get(proposal.user_role, frozenset()) else (f'Role {proposal.user_role} not permitted to perform {proposal.action}',),
+                'checks': {
+                    'permission': proposal.action in DEFAULT_ROLE_PERMISSIONS.get(proposal.user_role, frozenset()),
+                    'known_role': proposal.user_role in DEFAULT_ROLE_PERMISSIONS,
+                }
+            })()
+        })()
+    
+    # Try to load ML verifier
+    try:
+        ml_verifier = MLVerifier(model_dir=model_dir)
+        hybrid_verifier = HybridVerifier(
+            rule_verifier=rule_verifier,
+            ml_verifier=ml_verifier,
+            require_ml=False
+        )
+        ML_AVAILABLE = True
     except:
-        # Fallback: create rule verifier without database (will fail on entity checks)
-        rule_verifier = None
+        hybrid_verifier = None
+        ML_AVAILABLE = False
+        
+except Exception as e:
+    print(f"Warning: Error initializing verifiers: {e}")
+    # Fallback to basic permission checking
+    from veriagent.verifier import DEFAULT_ROLE_PERMISSIONS
+    rule_verifier = type('obj', (object,), {
+        'role_permissions': DEFAULT_ROLE_PERMISSIONS,
+        'verify': lambda self, proposal: type('obj', (object,), {
+            'decision': Decision.ALLOW if proposal.action in DEFAULT_ROLE_PERMISSIONS.get(proposal.user_role, frozenset()) else Decision.BLOCK,
+            'reasons': ('Permission check passed',) if proposal.action in DEFAULT_ROLE_PERMISSIONS.get(proposal.user_role, frozenset()) else (f'Role {proposal.user_role} not permitted to perform {proposal.action}',),
+            'checks': {
+                'permission': proposal.action in DEFAULT_ROLE_PERMISSIONS.get(proposal.user_role, frozenset()),
+                'known_role': proposal.user_role in DEFAULT_ROLE_PERMISSIONS,
+            }
+        })()
+    })()
     hybrid_verifier = None
     ML_AVAILABLE = False
 
