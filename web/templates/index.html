@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeriAgent - AI Agent Behavioral Verification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <rect width="32" height="32" rx="8" fill="url(#grad1)"/>
+                        <path d="M16 8L22 12V20L16 24L10 20V12L16 8Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="16" cy="16" r="3" fill="white"/>
+                        <defs>
+                            <linearGradient id="grad1" x1="0" y1="0" x2="32" y2="32">
+                                <stop offset="0%" style="stop-color:#6366f1"/>
+                                <stop offset="100%" style="stop-color:#8b5cf6"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <h1>VeriAgent</h1>
+                </div>
+                <div class="header-status">
+                    <div class="status-badge {% if ml_available %}status-active{% else %}status-inactive{% endif %}">
+                        <span class="status-dot"></span>
+                        <span>{{ 'ML Active' if ml_available else 'Rules Only' }}</span>
+                    </div>
+                </div>
+            </div>
+            <p class="tagline">Behavioral Verification for AI Agents</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Stats Cards -->
+        <section class="stats-grid" id="stats-section">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-success">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <p class="stat-label">Test Accuracy</p>
+                    <p class="stat-value" id="test-accuracy">--</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-warning">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <p class="stat-label">Adversarial Detection</p>
+                    <p class="stat-value" id="adversarial-accuracy">--</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-info">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <p class="stat-label">Model Type</p>
+                    <p class="stat-value" id="model-type">--</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-primary">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <p class="stat-label">Training Scenarios</p>
+                    <p class="stat-value" id="training-scenarios">--</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Interaction Area -->
+        <div class="interaction-grid">
+            <!-- Scenario Selection -->
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Try Example Scenarios</h2>
+                    <p class="panel-description">Select a pre-configured scenario to test the verifier</p>
+                </div>
+                <div class="panel-content">
+                    <div class="scenario-list" id="scenario-list">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Verification Form -->
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Custom Verification</h2>
+                    <p class="panel-description">Test your own scenarios</p>
+                </div>
+                <div class="panel-content">
+                    <form id="verify-form" class="verify-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="action">Action</label>
+                                <select id="action" name="action" required>
+                                    <option value="">Select action...</option>
+                                    <option value="get_customer">get_customer</option>
+                                    <option value="get_invoice">get_invoice</option>
+                                    <option value="calculate_balance">calculate_balance</option>
+                                    <option value="create_invoice">create_invoice</option>
+                                    <option value="update_customer">update_customer</option>
+                                    <option value="refund_customer">refund_customer</option>
+                                    <option value="send_email">send_email</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="user_role">User Role</label>
+                                <select id="user_role" name="user_role" required>
+                                    <option value="">Select role...</option>
+                                    <option value="READ_ONLY">READ_ONLY</option>
+                                    <option value="AGENT">AGENT</option>
+                                    <option value="ADMIN">ADMIN</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="parameters">Parameters (JSON)</label>
+                            <textarea id="parameters" name="parameters" rows="3" placeholder='{"customer_id": 123, "amount": 500}'></textarea>
+                            <small class="form-hint">Optional: Enter parameters as JSON object</small>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="9 11 12 14 22 4"></polyline>
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                                </svg>
+                                Verify Action
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="clear-btn">Clear</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+
+        <!-- Results Section -->
+        <section class="panel" id="results-panel" style="display: none;">
+            <div class="panel-header">
+                <h2>Verification Result</h2>
+                <button class="btn btn-ghost btn-sm" id="close-results">✕</button>
+            </div>
+            <div class="panel-content">
+                <div id="results-content">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 VeriAgent. Built with ML-powered behavioral verification.</p>
+            <p class="footer-tech">Random Forest + Rule-Based Hybrid System</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
